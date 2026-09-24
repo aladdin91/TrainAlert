@@ -7,7 +7,10 @@ builder.Services.AddControllers();
 
 builder.Services.AddScoped<TrainService>();
 
-builder.Services.AddScoped<ITrainDataProvider, FakeTrainDataProvider>();
+builder.Services.AddScoped<ITrainDataProvider, ViaggiaTrenoProvider>();
+
+builder.Services.AddHttpClient();
+
 
 var app = builder.Build();
 
