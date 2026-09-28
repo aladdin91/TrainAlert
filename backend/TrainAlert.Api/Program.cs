@@ -1,5 +1,6 @@
 using TrainAlert.Api.Providers;
 using TrainAlert.Api.Services;
+using TrainAlert.Api.Workers;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -16,6 +17,8 @@ builder.Services.AddScoped<TrainChangeDetector>();
 builder.Services.AddSingleton<TrainStateStore>();
 
 builder.Services.AddScoped<TrainStateMapper>();
+
+builder.Services.AddHostedService<TrainMonitoringWorker>();
 
 var app = builder.Build();
 
