@@ -11,6 +11,11 @@ builder.Services.AddScoped<ITrainDataProvider, ViaggiaTrenoProvider>();
 
 builder.Services.AddHttpClient();
 
+builder.Services.AddScoped<TrainChangeDetector>();
+
+builder.Services.AddSingleton<TrainStateStore>();
+
+builder.Services.AddScoped<TrainStateMapper>();
 
 var app = builder.Build();
 

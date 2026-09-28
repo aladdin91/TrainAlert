@@ -15,4 +15,7 @@ public class Train
     public int DelayMinutes { get; set; }
 
     public string? Platform { get; set; }
+
+        public bool Running { get; set; }
+    public bool NotDeparted { get; set; }
 }

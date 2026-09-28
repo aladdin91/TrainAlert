@@ -44,7 +44,10 @@ var result = trains.Select(dto => new Train
         : DateTime.MinValue,
     ActualDeparture = null,
     DelayMinutes = dto.DelayMinutes,
-    Platform = dto.Platform
+    Platform = dto.Platform,
+    Running = dto.Running,
+    NotDeparted = dto.NotDeparted
+    
 }).ToList();
 
 return result;
