@@ -1,4 +1,3 @@
-using TrainAlert.Api.Models;
 using TrainAlert.Api.Providers;
 using TrainAlert.Api.Services;
 
@@ -26,6 +25,15 @@ public class TrainMonitoringWorker : BackgroundService
             {
                 using var scope = _scopeFactory.CreateScope();
 
+                var alertService =
+                    scope.ServiceProvider
+                        .GetRequiredService<AlertService>();
+
+                var alerts = alertService
+                    .GetAll()
+                    .Where(alert => alert.IsEnabled)
+                    .ToList();
+
                 var provider =
                     scope.ServiceProvider
                         .GetRequiredService<ITrainDataProvider>();
@@ -42,36 +50,65 @@ public class TrainMonitoringWorker : BackgroundService
                     scope.ServiceProvider
                         .GetRequiredService<TrainChangeDetector>();
 
-                var trains = await provider.GetTrainsAsync();
-
-                _logger.LogInformation(
-                  "Monitoring found {Count} trains",
-                  trains.Count);
-
-                foreach (var train in trains)
+                foreach (var alert in alerts)
                 {
-                    var currentState = mapper.Map(train);
+                    var trains =
+                        await provider.GetTrainsAsync(
+                            alert.OriginStationId);
 
-                    var previousState =
-                        stateStore.Get(train.TrainNumber);
+var filteredTrains = trains
+    .Where(train =>
+        train.DestinationStationId ==
+        alert.DestinationStationId)
+    .Where(train =>
+    {
+        var departureTime =
+            TimeOnly.FromDateTime(
+                train.ScheduledDeparture);
 
-                    var change =
-                        changeDetector.Detect(
-                            previousState,
-                            currentState);
+        return departureTime >= alert.StartTime &&
+               departureTime <= alert.EndTime;
+    })
+    .ToList();
 
-                    if (change is not null)
+                    _logger.LogInformation(
+    "Alert {AlertId}: found {Count} matching trains: {Origin} -> {Destination}, between {StartTime} and {EndTime}",
+    alert.Id,
+    filteredTrains.Count,
+    alert.OriginStationName,
+    alert.DestinationStationName,
+    alert.StartTime,
+    alert.EndTime);
+
+                   foreach (var train in filteredTrains)
                     {
-                        _logger.LogInformation(
-                            "Train {TrainNumber} changed: delay {PreviousDelay} -> {CurrentDelay}, platform {PreviousPlatform} -> {CurrentPlatform}",
-                            change.TrainNumber,
-                            change.PreviousDelayMinutes,
-                            change.CurrentDelayMinutes,
-                            change.PreviousPlatform,
-                            change.CurrentPlatform);
-                    }
+                        var currentState =
+                            mapper.Map(train);
 
-                    stateStore.Set(currentState);
+                        var previousState =
+                            stateStore.Get(
+                                train.TrainNumber);
+
+                        var change =
+                            changeDetector.Detect(
+                                previousState,
+                                currentState);
+
+                        if (change is not null)
+                        {
+                            _logger.LogInformation(
+                                "Train {TrainNumber} changed: {Origin} -> {Destination}, delay {PreviousDelay} -> {CurrentDelay}, platform {PreviousPlatform} -> {CurrentPlatform}",
+                                change.TrainNumber,
+                                change.Origin,
+                                change.Destination,
+                                change.PreviousDelayMinutes,
+                                change.CurrentDelayMinutes,
+                                change.PreviousPlatform,
+                                change.CurrentPlatform);
+                        }
+
+                        stateStore.Set(currentState);
+                    }
                 }
             }
             catch (Exception ex)

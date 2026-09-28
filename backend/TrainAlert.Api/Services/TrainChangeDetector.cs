@@ -34,6 +34,8 @@ public class TrainChangeDetector
         return new TrainChange
         {
             TrainNumber = current.TrainNumber,
+            Origin = current.Origin,
+            Destination = current.Destination,
 
             PreviousDelayMinutes = previous.DelayMinutes,
             CurrentDelayMinutes = current.DelayMinutes,

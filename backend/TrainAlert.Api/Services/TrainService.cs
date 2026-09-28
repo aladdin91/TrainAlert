@@ -12,8 +12,8 @@ public class TrainService
         _trainDataProvider = trainDataProvider;
     }
 
-    public async Task<List<Train>> GetTrainsAsync()
-    {
-        return await _trainDataProvider.GetTrainsAsync();
-    }
+public async Task<List<Train>> GetTrainsAsync(string stationId)
+{
+    return await _trainDataProvider.GetTrainsAsync(stationId);
+}
 }

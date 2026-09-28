@@ -15,9 +15,11 @@ public class TrainsController : ControllerBase
     }
 
     [HttpGet]
-    public async Task<IActionResult> GetTrains()
+    public async Task<IActionResult> GetTrains(
+        [FromQuery] string stationId)
     {
-        var trains = await _trainService.GetTrainsAsync();
+        var trains =
+            await _trainService.GetTrainsAsync(stationId);
 
         return Ok(trains);
     }

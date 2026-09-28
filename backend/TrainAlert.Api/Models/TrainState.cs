@@ -13,4 +13,7 @@ public class TrainState
     public bool NotDeparted { get; set; }
 
     public DateTime ObservedAt { get; set; }
+    public string Origin { get; set; } = string.Empty;
+
+public string Destination { get; set; } = string.Empty;
 }

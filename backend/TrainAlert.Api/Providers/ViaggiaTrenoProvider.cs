@@ -13,7 +13,7 @@ public class ViaggiaTrenoProvider : ITrainDataProvider
         _httpClientFactory = httpClientFactory;
     }
 
-    public async Task<List<Train>> GetTrainsAsync()
+public async Task<List<Train>> GetTrainsAsync(string stationId)
     {
         var client = _httpClientFactory.CreateClient();
 
@@ -23,7 +23,7 @@ public class ViaggiaTrenoProvider : ITrainDataProvider
         );
 
         var url =
-            $"http://www.viaggiatreno.it/infomobilita/resteasy/viaggiatreno/partenze/S01511/{dateTime}";
+        $"http://www.viaggiatreno.it/infomobilita/resteasy/viaggiatreno/partenze/{stationId}/{dateTime}";
 
         var response = await client.GetAsync(url);
 
@@ -34,22 +34,27 @@ public class ViaggiaTrenoProvider : ITrainDataProvider
         var trains = JsonSerializer.Deserialize<List<ViaggiaTrenoTrainDto>>(json)
              ?? new List<ViaggiaTrenoTrainDto>();
 
-var result = trains.Select(dto => new Train
+return trains.Select(dto => new Train
 {
     TrainNumber = dto.TrainNumber.ToString(),
-    Origin = "CARNATE USMATE",
+
+    Origin = stationId,
+
+    DestinationStationId = dto.DestinationStationId,
+
     Destination = dto.Destination ?? string.Empty,
+
     ScheduledDeparture = dto.DepartureTime.HasValue
-        ? DateTimeOffset.FromUnixTimeMilliseconds(dto.DepartureTime.Value).LocalDateTime
+        ? DateTimeOffset
+            .FromUnixTimeMilliseconds(dto.DepartureTime.Value)
+            .LocalDateTime
         : DateTime.MinValue,
+
     ActualDeparture = null,
     DelayMinutes = dto.DelayMinutes,
     Platform = dto.Platform,
     Running = dto.Running,
     NotDeparted = dto.NotDeparted
-    
 }).ToList();
-
-return result;
     }
 }

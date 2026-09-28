@@ -4,7 +4,7 @@ namespace TrainAlert.Api.Providers;
 
 public class FakeTrainDataProvider : ITrainDataProvider
 {
-    public Task<List<Train>> GetTrainsAsync()
+public Task<List<Train>> GetTrainsAsync(string stationId)
     {
         var trains = new List<Train>
         {

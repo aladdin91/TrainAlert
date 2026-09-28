@@ -20,6 +20,8 @@ builder.Services.AddScoped<TrainStateMapper>();
 
 builder.Services.AddHostedService<TrainMonitoringWorker>();
 
+builder.Services.AddSingleton<AlertService>();
+
 var app = builder.Build();
 
 app.MapControllers();

@@ -19,4 +19,7 @@ public class TrainChange
     public bool? PreviousNotDeparted { get; set; }
 
     public bool? CurrentNotDeparted { get; set; }
+    public string Origin { get; set; } = string.Empty;
+
+public string Destination { get; set; } = string.Empty;
 }

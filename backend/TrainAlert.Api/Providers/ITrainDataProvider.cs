@@ -4,5 +4,5 @@ namespace TrainAlert.Api.Providers;
 
 public interface ITrainDataProvider
 {
-    Task<List<Train>> GetTrainsAsync();
+Task<List<Train>> GetTrainsAsync(string stationId);
 }
