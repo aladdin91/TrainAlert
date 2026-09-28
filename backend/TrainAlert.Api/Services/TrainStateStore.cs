@@ -6,15 +6,19 @@ public class TrainStateStore
 {
     private readonly Dictionary<string, TrainState> _states = new();
 
-    public TrainState? Get(string trainNumber)
+    public TrainState? Get(Guid alertId, string trainNumber)
     {
-        _states.TryGetValue(trainNumber, out var state);
+        var key = $"{alertId}:{trainNumber}";
+
+        _states.TryGetValue(key, out var state);
 
         return state;
     }
 
-    public void Set(TrainState state)
+    public void Set(Guid alertId, TrainState state)
     {
-        _states[state.TrainNumber] = state;
+        var key = $"{alertId}:{state.TrainNumber}";
+
+        _states[key] = state;
     }
 }

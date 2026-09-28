@@ -56,22 +56,22 @@ public class TrainMonitoringWorker : BackgroundService
                         await provider.GetTrainsAsync(
                             alert.OriginStationId);
 
-var filteredTrains = trains
-    .Where(train =>
-        string.Equals(
-            train.Destination,
-            alert.DestinationStationName,
-            StringComparison.OrdinalIgnoreCase))
-    .Where(train =>
-    {
-        var departureTime =
-            TimeOnly.FromDateTime(
-                train.ScheduledDeparture);
+                    var filteredTrains = trains
+                        .Where(train =>
+                            string.Equals(
+                                train.Destination,
+                                alert.DestinationStationName,
+                                StringComparison.OrdinalIgnoreCase))
+                        .Where(train =>
+                        {
+                            var departureTime =
+                                TimeOnly.FromDateTime(
+                                    train.ScheduledDeparture);
 
-        return departureTime >= alert.StartTime &&
-               departureTime <= alert.EndTime;
-    })
-    .ToList();
+                            return departureTime >= alert.StartTime &&
+                                   departureTime <= alert.EndTime;
+                        })
+                        .ToList();
 
                     _logger.LogInformation(
     "Alert {AlertId}: found {Count} matching trains: {Origin} -> {Destination}, between {StartTime} and {EndTime}",
@@ -82,14 +82,15 @@ var filteredTrains = trains
     alert.StartTime,
     alert.EndTime);
 
-                   foreach (var train in filteredTrains)
+                    foreach (var train in filteredTrains)
                     {
                         var currentState =
                             mapper.Map(train);
 
                         var previousState =
-                            stateStore.Get(
-                                train.TrainNumber);
+     stateStore.Get(
+         alert.Id,
+         train.TrainNumber);
 
                         var change =
                             changeDetector.Detect(
@@ -108,8 +109,20 @@ var filteredTrains = trains
                                 change.PreviousPlatform,
                                 change.CurrentPlatform);
                         }
+                        else if (previousState is null)
+                        {
+                            _logger.LogInformation(
+                                "Tracking train {TrainNumber}: {Origin} -> {Destination}, delay {Delay}, platform {Platform}",
+                                currentState.TrainNumber,
+                                currentState.Origin,
+                                currentState.Destination,
+                                currentState.DelayMinutes,
+                                currentState.Platform);
+                        }
 
-                        stateStore.Set(currentState);
+                        stateStore.Set(
+                            alert.Id,
+                            currentState);
                     }
                 }
             }
