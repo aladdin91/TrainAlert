@@ -58,8 +58,10 @@ public class TrainMonitoringWorker : BackgroundService
 
 var filteredTrains = trains
     .Where(train =>
-        train.DestinationStationId ==
-        alert.DestinationStationId)
+        string.Equals(
+            train.Destination,
+            alert.DestinationStationName,
+            StringComparison.OrdinalIgnoreCase))
     .Where(train =>
     {
         var departureTime =

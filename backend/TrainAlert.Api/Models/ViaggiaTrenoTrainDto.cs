@@ -10,8 +10,6 @@ public class ViaggiaTrenoTrainDto
     [JsonPropertyName("destinazione")]
     public string? Destination { get; set; }
 
-[JsonPropertyName("codDestinazione")]
-public string? DestinationStationId { get; set; }
 
     [JsonPropertyName("orarioPartenza")]
     public long? DepartureTime { get; set; }

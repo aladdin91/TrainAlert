@@ -18,5 +18,5 @@ public class Train
 
         public bool Running { get; set; }
     public bool NotDeparted { get; set; }
-    public string? DestinationStationId { get; set; }
+
 }

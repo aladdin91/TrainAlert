@@ -31,8 +31,11 @@ public async Task<List<Train>> GetTrainsAsync(string stationId)
 
         var json = await response.Content.ReadAsStringAsync();
 
-        var trains = JsonSerializer.Deserialize<List<ViaggiaTrenoTrainDto>>(json)
-             ?? new List<ViaggiaTrenoTrainDto>();
+   var trains =
+    JsonSerializer.Deserialize<List<ViaggiaTrenoTrainDto>>(json)
+    ?? new List<ViaggiaTrenoTrainDto>();
+
+
 
 return trains.Select(dto => new Train
 {
@@ -40,7 +43,7 @@ return trains.Select(dto => new Train
 
     Origin = stationId,
 
-    DestinationStationId = dto.DestinationStationId,
+
 
     Destination = dto.Destination ?? string.Empty,
 
