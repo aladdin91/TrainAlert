@@ -3,6 +3,8 @@ using TrainAlert.Api.Services;
 
 namespace TrainAlert.Api.Workers;
 
+
+
 public class TrainMonitoringWorker : BackgroundService
 {
     private readonly IServiceScopeFactory _scopeFactory;
@@ -49,6 +51,10 @@ public class TrainMonitoringWorker : BackgroundService
                 var changeDetector =
                     scope.ServiceProvider
                         .GetRequiredService<TrainChangeDetector>();
+
+                var notificationService =
+scope.ServiceProvider
+.GetRequiredService<INotificationService>();
 
                 foreach (var alert in alerts)
                 {
@@ -100,14 +106,17 @@ public class TrainMonitoringWorker : BackgroundService
                         if (change is not null)
                         {
                             _logger.LogInformation(
-                                "Train {TrainNumber} changed: {Origin} -> {Destination}, delay {PreviousDelay} -> {CurrentDelay}, platform {PreviousPlatform} -> {CurrentPlatform}",
-                                change.TrainNumber,
-                                change.Origin,
-                                change.Destination,
-                                change.PreviousDelayMinutes,
-                                change.CurrentDelayMinutes,
-                                change.PreviousPlatform,
-                                change.CurrentPlatform);
+        "[{Time}] Train {TrainNumber} changed: {Origin} -> {Destination}, delay {PreviousDelay} -> {CurrentDelay}, platform {PreviousPlatform} -> {CurrentPlatform}",
+        DateTime.Now.ToString("HH:mm:ss"),
+        change.TrainNumber,
+        change.Origin,
+        change.Destination,
+        change.PreviousDelayMinutes,
+        change.CurrentDelayMinutes,
+        change.PreviousPlatform,
+        change.CurrentPlatform);
+
+                            await notificationService.NotifyAsync(change);
                         }
                         else if (previousState is null)
                         {

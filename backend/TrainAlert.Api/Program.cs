@@ -22,6 +22,8 @@ builder.Services.AddHostedService<TrainMonitoringWorker>();
 
 builder.Services.AddSingleton<AlertService>();
 
+builder.Services.AddScoped<INotificationService, LogNotificationService>();
+
 var app = builder.Build();
 
 app.MapControllers();
