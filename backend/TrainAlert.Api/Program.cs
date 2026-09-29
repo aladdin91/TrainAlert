@@ -1,9 +1,14 @@
 using TrainAlert.Api.Providers;
 using TrainAlert.Api.Services;
 using TrainAlert.Api.Workers;
-
+using Microsoft.AspNetCore.Identity;
+using TrainAlert.Api.Models;
 using Microsoft.EntityFrameworkCore;
 using TrainAlert.Api.Data;
+
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.IdentityModel.Tokens;
+using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -12,6 +17,36 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
         builder.Configuration.GetConnectionString("DefaultConnection")));
 
 builder.Services.AddControllers();
+
+builder.Services.AddAuthentication(
+    JwtBearerDefaults.AuthenticationScheme)
+    .AddJwtBearer(options =>
+    {
+      var jwtKey =
+          builder.Configuration["Jwt:Key"]
+          ?? throw new InvalidOperationException(
+              "JWT key is not configured.");
+
+      options.TokenValidationParameters = new TokenValidationParameters
+      {
+        ValidateIssuer = true,
+        ValidateAudience = true,
+        ValidateLifetime = true,
+        ValidateIssuerSigningKey = true,
+
+        ValidIssuer =
+              builder.Configuration["Jwt:Issuer"],
+
+        ValidAudience =
+              builder.Configuration["Jwt:Audience"],
+
+        IssuerSigningKey =
+              new SymmetricSecurityKey(
+                  Encoding.UTF8.GetBytes(jwtKey))
+      };
+    });
+
+builder.Services.AddAuthorization();
 
 builder.Services.AddScoped<TrainService>();
 
@@ -29,10 +64,18 @@ builder.Services.AddHostedService<TrainMonitoringWorker>();
 
 builder.Services.AddScoped<AlertService>();
 
+builder.Services.AddScoped<AuthService>();
+builder.Services.AddScoped<PasswordHasher<User>>();
+
 builder.Services.AddScoped<INotificationService, LogNotificationService>();
 
 var app = builder.Build();
 
+app.UseAuthentication();
+app.UseAuthorization();
+
 app.MapControllers();
+
+
 
 app.Run();

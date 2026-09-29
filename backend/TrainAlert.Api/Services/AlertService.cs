@@ -13,10 +13,20 @@ public class AlertService
         _db = db;
     }
 
-    public async Task<List<AlertConfiguration>> GetAllAsync()
+    public async Task<List<AlertConfiguration>> GetAllAsync(
+        Guid userId)
     {
         return await _db.Alerts
             .AsNoTracking()
+            .Where(alert => alert.UserId == userId)
+            .ToListAsync();
+    }
+
+    public async Task<List<AlertConfiguration>> GetAllForMonitoringAsync()
+    {
+        return await _db.Alerts
+            .AsNoTracking()
+            .Where(alert => alert.IsEnabled)
             .ToListAsync();
     }
 
@@ -33,17 +43,26 @@ public class AlertService
     }
 
     public async Task<AlertConfiguration?> GetByIdAsync(
-        Guid id)
+        Guid id,
+        Guid userId)
     {
         return await _db.Alerts
             .AsNoTracking()
-            .FirstOrDefaultAsync(a => a.Id == id);
+            .FirstOrDefaultAsync(
+                alert =>
+                    alert.Id == id &&
+                    alert.UserId == userId);
     }
 
-    public async Task<bool> DeleteAsync(Guid id)
+    public async Task<bool> DeleteAsync(
+        Guid id,
+        Guid userId)
     {
         var alert = await _db.Alerts
-            .FirstOrDefaultAsync(a => a.Id == id);
+            .FirstOrDefaultAsync(
+                alert =>
+                    alert.Id == id &&
+                    alert.UserId == userId);
 
         if (alert is null)
         {
