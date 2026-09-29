@@ -31,10 +31,9 @@ public class TrainMonitoringWorker : BackgroundService
                     scope.ServiceProvider
                         .GetRequiredService<AlertService>();
 
-                var alerts = alertService
-                    .GetAll()
-                    .Where(alert => alert.IsEnabled)
-                    .ToList();
+                var alerts = (await alertService.GetAllAsync())
+       .Where(alert => alert.IsEnabled)
+       .ToList();
 
                 var provider =
                     scope.ServiceProvider

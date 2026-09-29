@@ -2,7 +2,14 @@ using TrainAlert.Api.Providers;
 using TrainAlert.Api.Services;
 using TrainAlert.Api.Workers;
 
+using Microsoft.EntityFrameworkCore;
+using TrainAlert.Api.Data;
+
 var builder = WebApplication.CreateBuilder(args);
+
+builder.Services.AddDbContext<ApplicationDbContext>(options =>
+    options.UseNpgsql(
+        builder.Configuration.GetConnectionString("DefaultConnection")));
 
 builder.Services.AddControllers();
 
@@ -20,7 +27,7 @@ builder.Services.AddScoped<TrainStateMapper>();
 
 builder.Services.AddHostedService<TrainMonitoringWorker>();
 
-builder.Services.AddSingleton<AlertService>();
+builder.Services.AddScoped<AlertService>();
 
 builder.Services.AddScoped<INotificationService, LogNotificationService>();
 

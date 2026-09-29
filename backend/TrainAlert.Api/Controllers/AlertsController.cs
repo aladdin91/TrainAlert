@@ -16,15 +16,19 @@ public class AlertsController : ControllerBase
     }
 
     [HttpGet]
-    public IActionResult GetAlerts()
+    public async Task<IActionResult> GetAlerts()
     {
-        return Ok(_alertService.GetAll());
+        var alerts = await _alertService.GetAllAsync();
+
+        return Ok(alerts);
     }
 
     [HttpPost]
-    public IActionResult CreateAlert(AlertConfiguration alert)
+    public async Task<IActionResult> CreateAlert(
+        AlertConfiguration alert)
     {
-        var createdAlert = _alertService.Add(alert);
+        var createdAlert =
+            await _alertService.AddAsync(alert);
 
         return CreatedAtAction(
             nameof(GetAlert),
@@ -33,9 +37,10 @@ public class AlertsController : ControllerBase
     }
 
     [HttpGet("{id:guid}")]
-    public IActionResult GetAlert(Guid id)
+    public async Task<IActionResult> GetAlert(Guid id)
     {
-        var alert = _alertService.GetById(id);
+        var alert =
+            await _alertService.GetByIdAsync(id);
 
         if (alert is null)
         {
@@ -46,9 +51,10 @@ public class AlertsController : ControllerBase
     }
 
     [HttpDelete("{id:guid}")]
-    public IActionResult DeleteAlert(Guid id)
+    public async Task<IActionResult> DeleteAlert(Guid id)
     {
-        var deleted = _alertService.Delete(id);
+        var deleted =
+            await _alertService.DeleteAsync(id);
 
         if (!deleted)
         {

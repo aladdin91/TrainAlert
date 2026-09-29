@@ -1,40 +1,58 @@
+using Microsoft.EntityFrameworkCore;
+using TrainAlert.Api.Data;
 using TrainAlert.Api.Models;
 
 namespace TrainAlert.Api.Services;
 
 public class AlertService
 {
-    private readonly List<AlertConfiguration> _alerts = new();
+    private readonly ApplicationDbContext _db;
 
-    public List<AlertConfiguration> GetAll()
+    public AlertService(ApplicationDbContext db)
     {
-        return _alerts.ToList();
+        _db = db;
     }
 
-    public AlertConfiguration Add(AlertConfiguration alert)
+    public async Task<List<AlertConfiguration>> GetAllAsync()
+    {
+        return await _db.Alerts
+            .AsNoTracking()
+            .ToListAsync();
+    }
+
+    public async Task<AlertConfiguration> AddAsync(
+        AlertConfiguration alert)
     {
         alert.Id = Guid.NewGuid();
 
-        _alerts.Add(alert);
+        _db.Alerts.Add(alert);
+
+        await _db.SaveChangesAsync();
 
         return alert;
     }
 
-    public AlertConfiguration? GetById(Guid id)
+    public async Task<AlertConfiguration?> GetByIdAsync(
+        Guid id)
     {
-        return _alerts.FirstOrDefault(a => a.Id == id);
+        return await _db.Alerts
+            .AsNoTracking()
+            .FirstOrDefaultAsync(a => a.Id == id);
     }
 
-    public bool Delete(Guid id)
+    public async Task<bool> DeleteAsync(Guid id)
     {
-        var alert = GetById(id);
+        var alert = await _db.Alerts
+            .FirstOrDefaultAsync(a => a.Id == id);
 
         if (alert is null)
         {
             return false;
         }
 
-        _alerts.Remove(alert);
+        _db.Alerts.Remove(alert);
+
+        await _db.SaveChangesAsync();
 
         return true;
     }
