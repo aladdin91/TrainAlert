@@ -6,14 +6,14 @@ public class DisruptionRouteMatcher
 {
   public bool MatchesRoute(
       Disruption disruption,
-      RouteDefinition route)
+      IEnumerable<TrainStop> stops)
   {
     if (!disruption.IsActive)
     {
       return false;
     }
 
-    if (disruption.Scope == "Train")
+    if (disruption.Scope is "Train" or "Network")
     {
       return false;
     }
@@ -22,10 +22,11 @@ public class DisruptionRouteMatcher
         $"{disruption.Title} {disruption.Description}"
             .ToLowerInvariant();
 
-    var routeStations =
-        route.Stations
-            .Select(station =>
-                station.ToLowerInvariant());
+    var routeStations = stops
+        .Select(stop => stop.StationName)
+        .Where(station => !string.IsNullOrWhiteSpace(station))
+        .Select(station => station.ToLowerInvariant())
+        .Distinct(StringComparer.OrdinalIgnoreCase);
 
     return routeStations.Any(
         station => text.Contains(station));

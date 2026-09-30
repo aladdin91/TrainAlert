@@ -1,5 +1,6 @@
 
 using Microsoft.AspNetCore.Mvc;
+using System.Text.RegularExpressions;
 
 using TrainAlert.Api.Providers;
 using TrainAlert.Api.Services;
@@ -24,22 +25,22 @@ public class RoutesController : ControllerBase
   [HttpGet("status")]
   public async Task<IActionResult> GetStatus(
       [FromQuery] string originStationId,
-      [FromQuery] string destinationName)
+      [FromQuery] string destinationStationId)
   {
-    if (string.IsNullOrWhiteSpace(originStationId) ||
-        string.IsNullOrWhiteSpace(destinationName))
+    if (!IsValidStationId(originStationId) ||
+        !IsValidStationId(destinationStationId))
     {
       return BadRequest(new
       {
         message =
-              "originStationId and destinationName are required."
+              "Valid originStationId and destinationStationId are required."
       });
     }
 
     var status =
         await _routeStatusService.GetStatusAsync(
             originStationId,
-            destinationName);
+            destinationStationId);
 
     return Ok(status);
   }
@@ -52,5 +53,11 @@ public class RoutesController : ControllerBase
             .GetDisruptionsAsync();
 
     return Ok(disruptions);
+  }
+
+  private static bool IsValidStationId(string? stationId)
+  {
+    return stationId is not null &&
+           Regex.IsMatch(stationId, "^S\\d{5}$");
   }
 }

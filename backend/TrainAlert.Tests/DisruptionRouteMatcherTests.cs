@@ -7,19 +7,10 @@ public class DisruptionRouteMatcherTests
 {
   private readonly DisruptionRouteMatcher _matcher = new();
 
-  private readonly RouteDefinition _route = new()
-  {
-    OriginStationId = "S01511",
-    OriginStationName = "CARNATE USMATE",
-    DestinationStationId = "S01645",
-    DestinationStationName = "MILANO PORTA GARIBALDI",
-    Stations =
-      [
-          "CARNATE USMATE",
-            "MILANO GRECO PIRELLI",
-            "MILANO PORTA GARIBALDI"
-      ]
-  };
+  private readonly List<TrainStop> _route =
+    [new() { StationName = "CARNATE USMATE" },
+     new() { StationName = "MILANO GRECO PIRELLI" },
+     new() { StationName = "MILANO PORTA GARIBALDI" }];
 
   [Fact]
   public void ActiveDisruptionMentioningRouteStation_Matches()

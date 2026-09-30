@@ -76,7 +76,7 @@ builder.Services.AddScoped<RouteStatusService>();
 
 builder.Services.AddScoped<DisruptionAnalyzer>();
 
-builder.Services.AddScoped<RouteDefinitionService>();
+builder.Services.AddScoped<DisruptionRouteMatcher>();
 
 builder.Services.AddScoped<
     IInfomobilityProvider,
