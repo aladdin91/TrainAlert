@@ -49,8 +49,11 @@ builder.Services.AddAuthentication(
 builder.Services.AddAuthorization();
 
 builder.Services.AddScoped<TrainService>();
+builder.Services.AddScoped<TrainDestinationFilter>();
 
 builder.Services.AddScoped<ITrainDataProvider, ViaggiaTrenoProvider>();
+builder.Services.AddScoped<IStationSearchProvider, ViaggiaTrenoProvider>();
+builder.Services.AddScoped<StationSearchService>();
 
 builder.Services.AddHttpClient();
 
@@ -68,6 +71,16 @@ builder.Services.AddScoped<AuthService>();
 builder.Services.AddScoped<PasswordHasher<User>>();
 
 builder.Services.AddScoped<INotificationService, LogNotificationService>();
+
+builder.Services.AddScoped<RouteStatusService>();
+
+builder.Services.AddScoped<DisruptionAnalyzer>();
+
+builder.Services.AddScoped<RouteDefinitionService>();
+
+builder.Services.AddScoped<
+    IInfomobilityProvider,
+    ViaggiaTrenoInfomobilityProvider>();
 
 var app = builder.Build();
 

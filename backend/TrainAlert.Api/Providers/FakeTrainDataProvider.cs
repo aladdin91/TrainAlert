@@ -32,4 +32,25 @@ public Task<List<Train>> GetTrainsAsync(string stationId)
 
         return Task.FromResult(trains);
     }
+
+    public Task<List<Train>> GetArrivalsAsync(string stationId)
+    {
+        return Task.FromResult(new List<Train>());
+    }
+
+    public Task<TrainDetails> GetTrainDetailsAsync(
+        string originStationId,
+        string trainNumber,
+        long departureDateEpochMilliseconds)
+    {
+        return Task.FromResult(new TrainDetails());
+    }
+
+    public Task<List<TrainStop>> GetTrainStopsAsync(
+        string originStationId,
+        string trainNumber,
+        long departureDateEpochMilliseconds)
+    {
+        return Task.FromResult(new List<TrainStop>());
+    }
 }

@@ -1,5 +1,6 @@
 using TrainAlert.Api.Providers;
 using TrainAlert.Api.Services;
+using TrainAlert.Api.Models;
 
 namespace TrainAlert.Api.Workers;
 
@@ -16,6 +17,30 @@ public class TrainMonitoringWorker : BackgroundService
     {
         _scopeFactory = scopeFactory;
         _logger = logger;
+    }
+
+    public static bool ShouldProcessAlert(
+        AlertConfiguration alert,
+        TimeOnly currentTime)
+    {
+        if (!alert.IsEnabled)
+        {
+            return false;
+        }
+
+        if (alert.StartTime < alert.EndTime)
+        {
+            return currentTime >= alert.StartTime &&
+                   currentTime < alert.EndTime;
+        }
+
+        if (alert.StartTime > alert.EndTime)
+        {
+            return currentTime >= alert.StartTime ||
+                   currentTime < alert.EndTime;
+        }
+
+        return false;
     }
 
     protected override async Task ExecuteAsync(
@@ -54,8 +79,16 @@ public class TrainMonitoringWorker : BackgroundService
 scope.ServiceProvider
 .GetRequiredService<INotificationService>();
 
+                var currentTime =
+                    TimeOnly.FromDateTime(DateTime.Now);
+
                 foreach (var alert in alerts)
                 {
+                    if (!ShouldProcessAlert(alert, currentTime))
+                    {
+                        continue;
+                    }
+
                     var trains =
                         await provider.GetTrainsAsync(
                             alert.OriginStationId);

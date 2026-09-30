@@ -1,6 +1,6 @@
 namespace TrainAlert.Api.Models;
 
-public class Train
+public class TrainDetails
 {
     public string TrainNumber { get; set; } = string.Empty;
 
@@ -10,19 +10,13 @@ public class Train
 
     public string Destination { get; set; } = string.Empty;
 
-    public DateTime ScheduledDeparture { get; set; }
+    public string DestinationStationId { get; set; } = string.Empty;
 
-    public DateTime? ActualDeparture { get; set; }
+    public DateTime? ScheduledDeparture { get; set; }
 
     public DateTime? ScheduledArrival { get; set; }
 
-    public DateTime? ActualArrival { get; set; }
-
-    public long? DepartureDateEpochMilliseconds { get; set; }
-
     public int DelayMinutes { get; set; }
-
-    public string? Platform { get; set; }
 
     public bool Running { get; set; }
 
