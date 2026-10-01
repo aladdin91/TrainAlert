@@ -110,6 +110,8 @@ builder.Services.AddScoped<
     IInfomobilityProvider,
     ViaggiaTrenoInfomobilityProvider>();
 
+builder.Services.AddScoped<NotificationService>();
+
 var app = builder.Build();
 
 app.UseSwagger();
