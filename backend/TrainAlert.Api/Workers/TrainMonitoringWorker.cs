@@ -1,10 +1,8 @@
+using TrainAlert.Api.Models;
 using TrainAlert.Api.Providers;
 using TrainAlert.Api.Services;
-using TrainAlert.Api.Models;
 
 namespace TrainAlert.Api.Workers;
-
-
 
 public class TrainMonitoringWorker : BackgroundService
 {
@@ -57,11 +55,15 @@ public class TrainMonitoringWorker : BackgroundService
                         .GetRequiredService<AlertService>();
 
                 var alerts =
-        await alertService.GetAllForMonitoringAsync();
+                    await alertService.GetAllForMonitoringAsync();
 
                 var provider =
                     scope.ServiceProvider
                         .GetRequiredService<ITrainDataProvider>();
+
+                var destinationFilter =
+                    scope.ServiceProvider
+                        .GetRequiredService<TrainDestinationFilter>();
 
                 var stateStore =
                     scope.ServiceProvider
@@ -76,8 +78,8 @@ public class TrainMonitoringWorker : BackgroundService
                         .GetRequiredService<TrainChangeDetector>();
 
                 var notificationService =
-scope.ServiceProvider
-.GetRequiredService<INotificationService>();
+                    scope.ServiceProvider
+                        .GetRequiredService<INotificationService>();
 
                 var currentTime =
                     TimeOnly.FromDateTime(DateTime.Now);
@@ -93,31 +95,48 @@ scope.ServiceProvider
                         await provider.GetTrainsAsync(
                             alert.OriginStationId);
 
-                    var filteredTrains = trains
-                        .Where(train =>
-                            string.Equals(
-                                train.Destination,
-                                alert.DestinationStationName,
-                                StringComparison.OrdinalIgnoreCase))
-                        .Where(train =>
-                        {
-                            var departureTime =
-                                TimeOnly.FromDateTime(
-                                    train.ScheduledDeparture);
+                    var filteredTrains = new List<Train>();
 
-                            return departureTime >= alert.StartTime &&
-                                   departureTime <= alert.EndTime;
-                        })
-                        .ToList();
+                    foreach (var train in trains)
+                    {
+                        var departureTime =
+                            TimeOnly.FromDateTime(
+                                train.ScheduledDeparture);
+
+                        if (departureTime < alert.StartTime ||
+                            departureTime > alert.EndTime)
+                        {
+                            continue;
+                        }
+
+                        if (!train.DepartureDateEpochMilliseconds.HasValue)
+                        {
+                            continue;
+                        }
+
+                        var stops =
+                            await provider.GetTrainStopsAsync(
+                                train.OriginStationId,
+                                train.TrainNumber,
+                                train.DepartureDateEpochMilliseconds.Value);
+
+                        if (destinationFilter.StopsAtDestination(
+                                stops,
+                                alert.DestinationStationId))
+                        {
+                            filteredTrains.Add(train);
+                        }
+                    }
 
                     _logger.LogInformation(
-    "Alert {AlertId}: found {Count} matching trains: {Origin} -> {Destination}, between {StartTime} and {EndTime}",
-    alert.Id,
-    filteredTrains.Count,
-    alert.OriginStationName,
-    alert.DestinationStationName,
-    alert.StartTime,
-    alert.EndTime);
+                        "[{Time}] Alert {AlertId}: found {Count} matching trains: {Origin} -> {Destination}, between {StartTime} and {EndTime}",
+                        DateTime.Now.ToString("HH:mm:ss"),
+                        alert.Id,
+                        filteredTrains.Count,
+                        alert.OriginStationName,
+                        alert.DestinationStationName,
+                        alert.StartTime,
+                        alert.EndTime);
 
                     foreach (var train in filteredTrains)
                     {
@@ -125,9 +144,9 @@ scope.ServiceProvider
                             mapper.Map(train);
 
                         var previousState =
-     stateStore.Get(
-         alert.Id,
-         train.TrainNumber);
+                            stateStore.Get(
+                                alert.Id,
+                                train.TrainNumber);
 
                         var change =
                             changeDetector.Detect(
@@ -137,15 +156,15 @@ scope.ServiceProvider
                         if (change is not null)
                         {
                             _logger.LogInformation(
-        "[{Time}] Train {TrainNumber} changed: {Origin} -> {Destination}, delay {PreviousDelay} -> {CurrentDelay}, platform {PreviousPlatform} -> {CurrentPlatform}",
-        DateTime.Now.ToString("HH:mm:ss"),
-        change.TrainNumber,
-        change.Origin,
-        change.Destination,
-        change.PreviousDelayMinutes,
-        change.CurrentDelayMinutes,
-        change.PreviousPlatform,
-        change.CurrentPlatform);
+                                "[{Time}] Train {TrainNumber} changed: {Origin} -> {Destination}, delay {PreviousDelay} -> {CurrentDelay}, platform {PreviousPlatform} -> {CurrentPlatform}",
+                                DateTime.Now.ToString("HH:mm:ss"),
+                                change.TrainNumber,
+                                change.Origin,
+                                change.Destination,
+                                change.PreviousDelayMinutes,
+                                change.CurrentDelayMinutes,
+                                change.PreviousPlatform,
+                                change.CurrentPlatform);
 
                             await notificationService.NotifyAsync(change);
                         }

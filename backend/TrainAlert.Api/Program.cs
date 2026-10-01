@@ -18,6 +18,34 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
 
 builder.Services.AddControllers();
 
+builder.Services.AddEndpointsApiExplorer();
+
+builder.Services.AddSwaggerGen(options =>
+{
+  options.SwaggerDoc("v1", new Microsoft.OpenApi.OpenApiInfo
+  {
+    Title = "TrainAlert API",
+    Version = "v1",
+    Description = "TrainAlert backend API"
+  });
+
+  options.AddSecurityDefinition("Bearer", new Microsoft.OpenApi.OpenApiSecurityScheme
+  {
+    Name = "Authorization",
+    Type = Microsoft.OpenApi.SecuritySchemeType.Http,
+    Scheme = "bearer",
+    BearerFormat = "JWT",
+    In = Microsoft.OpenApi.ParameterLocation.Header,
+    Description = "Enter your JWT token"
+  });
+
+  options.AddSecurityRequirement(document =>
+      new Microsoft.OpenApi.OpenApiSecurityRequirement
+      {
+        [new Microsoft.OpenApi.OpenApiSecuritySchemeReference("Bearer", document)] = []
+      });
+});
+
 builder.Services.AddAuthentication(
     JwtBearerDefaults.AuthenticationScheme)
     .AddJwtBearer(options =>
@@ -83,6 +111,9 @@ builder.Services.AddScoped<
     ViaggiaTrenoInfomobilityProvider>();
 
 var app = builder.Build();
+
+app.UseSwagger();
+app.UseSwaggerUI();
 
 app.UseAuthentication();
 app.UseAuthorization();
