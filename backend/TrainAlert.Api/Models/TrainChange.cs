@@ -21,5 +21,12 @@ public class TrainChange
     public bool? CurrentNotDeparted { get; set; }
     public string Origin { get; set; } = string.Empty;
 
-public string Destination { get; set; } = string.Empty;
+    public string Destination { get; set; } = string.Empty;
+    public bool? PreviousCancelled { get; set; }
+
+    public bool? CurrentCancelled { get; set; }
+
+    public string? PreviousDisruptionReason { get; set; }
+
+    public string? CurrentDisruptionReason { get; set; }
 }

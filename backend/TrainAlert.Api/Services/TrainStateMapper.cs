@@ -13,9 +13,11 @@ public class TrainStateMapper
             Platform = train.Platform,
             Running = train.Running,
             NotDeparted = train.NotDeparted,
-            ObservedAt = DateTime.UtcNow,   
+            ObservedAt = DateTime.UtcNow,
             Origin = train.Origin,
             Destination = train.Destination,
+            Cancelled = train.Cancelled,
+            DisruptionReason = train.DisruptionReason,
         };
     }
 }

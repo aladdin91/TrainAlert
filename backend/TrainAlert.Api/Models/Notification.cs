@@ -29,4 +29,11 @@ public class Notification
   public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
 
   public bool IsRead { get; set; }
+  public bool? PreviousCancelled { get; set; }
+
+  public bool? CurrentCancelled { get; set; }
+
+  public string? PreviousDisruptionReason { get; set; }
+
+  public string? CurrentDisruptionReason { get; set; }
 }

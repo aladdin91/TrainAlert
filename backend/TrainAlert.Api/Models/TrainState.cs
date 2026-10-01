@@ -15,5 +15,8 @@ public class TrainState
     public DateTime ObservedAt { get; set; }
     public string Origin { get; set; } = string.Empty;
 
-public string Destination { get; set; } = string.Empty;
+    public string Destination { get; set; } = string.Empty;
+    public bool Cancelled { get; set; }
+
+    public string? DisruptionReason { get; set; }
 }

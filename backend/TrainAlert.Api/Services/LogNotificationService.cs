@@ -39,6 +39,14 @@ public class LogNotificationService : INotificationService
 
       PreviousRunning = change.PreviousRunning,
       CurrentRunning = change.CurrentRunning,
+      PreviousCancelled = change.PreviousCancelled,
+      CurrentCancelled = change.CurrentCancelled,
+
+      PreviousDisruptionReason =
+    change.PreviousDisruptionReason,
+
+      CurrentDisruptionReason =
+    change.CurrentDisruptionReason,
 
       PreviousNotDeparted = change.PreviousNotDeparted,
       CurrentNotDeparted = change.CurrentNotDeparted,

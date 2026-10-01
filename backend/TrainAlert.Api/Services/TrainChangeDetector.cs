@@ -23,10 +23,18 @@ public class TrainChangeDetector
         var notDepartedChanged =
             previous.NotDeparted != current.NotDeparted;
 
+        var cancelledChanged =
+            previous.Cancelled != current.Cancelled;
+
+        var disruptionReasonChanged =
+            previous.DisruptionReason != current.DisruptionReason;
+
         if (!delayChanged &&
-            !platformChanged &&
-            !runningChanged &&
-            !notDepartedChanged)
+       !platformChanged &&
+       !runningChanged &&
+       !notDepartedChanged &&
+       !cancelledChanged &&
+       !disruptionReasonChanged)
         {
             return null;
         }
@@ -47,7 +55,12 @@ public class TrainChangeDetector
             CurrentRunning = current.Running,
 
             PreviousNotDeparted = previous.NotDeparted,
-            CurrentNotDeparted = current.NotDeparted
+            CurrentNotDeparted = current.NotDeparted,
+            PreviousCancelled = previous.Cancelled,
+            CurrentCancelled = current.Cancelled,
+
+            PreviousDisruptionReason = previous.DisruptionReason,
+            CurrentDisruptionReason = current.DisruptionReason,
         };
     }
 }

@@ -111,6 +111,7 @@ builder.Services.AddScoped<
     ViaggiaTrenoInfomobilityProvider>();
 
 builder.Services.AddScoped<NotificationService>();
+builder.Services.AddScoped<NotificationDecisionService>();
 
 var app = builder.Build();
 
