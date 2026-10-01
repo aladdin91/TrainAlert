@@ -4,5 +4,8 @@ namespace TrainAlert.Api.Services;
 
 public interface INotificationService
 {
-  Task NotifyAsync(TrainChange change);
+  Task NotifyAsync(
+      Guid userId,
+      Guid alertId,
+      TrainChange change);
 }

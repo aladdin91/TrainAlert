@@ -166,7 +166,10 @@ public class TrainMonitoringWorker : BackgroundService
                                 change.PreviousPlatform,
                                 change.CurrentPlatform);
 
-                            await notificationService.NotifyAsync(change);
+                            await notificationService.NotifyAsync(
+                                alert.UserId,
+                                alert.Id,
+                                change);
                         }
                         else if (previousState is null)
                         {

@@ -12,10 +12,15 @@ public class LogNotificationService : INotificationService
     _logger = logger;
   }
 
-  public Task NotifyAsync(TrainChange change)
+  public Task NotifyAsync(
+     Guid userId,
+     Guid alertId,
+     TrainChange change)
   {
     _logger.LogInformation(
-        "[NOTIFICATION] Train {TrainNumber}: {Origin} -> {Destination}, delay {PreviousDelay} -> {CurrentDelay}, platform {PreviousPlatform} -> {CurrentPlatform}",
+        "[NOTIFICATION] User {UserId}, Alert {AlertId}, Train {TrainNumber}: {Origin} -> {Destination}, delay {PreviousDelay} -> {CurrentDelay}, platform {PreviousPlatform} -> {CurrentPlatform}",
+        userId,
+        alertId,
         change.TrainNumber,
         change.Origin,
         change.Destination,

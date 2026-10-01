@@ -11,4 +11,6 @@ public class User
   public DateTime CreatedAt { get; set; }
 
   public List<AlertConfiguration> Alerts { get; set; } = new();
+
+  public ICollection<Notification> Notifications { get; set; } = [];
 }
