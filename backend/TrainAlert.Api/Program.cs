@@ -113,6 +113,9 @@ builder.Services.AddScoped<
 builder.Services.AddScoped<NotificationService>();
 builder.Services.AddScoped<NotificationDecisionService>();
 
+builder.Services.AddScoped<TrenordStrikeParser>();
+builder.Services.AddScoped<IStrikeProvider, TrenordStrikeProvider>();
+
 var app = builder.Build();
 
 app.UseSwagger();

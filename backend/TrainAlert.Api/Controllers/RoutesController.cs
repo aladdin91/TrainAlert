@@ -14,12 +14,16 @@ public class RoutesController : ControllerBase
   private readonly RouteStatusService _routeStatusService;
   private readonly IInfomobilityProvider _infomobilityProvider;
 
+  private readonly IStrikeProvider _strikeProvider;
+
   public RoutesController(
       RouteStatusService routeStatusService,
-      IInfomobilityProvider infomobilityProvider)
+      IInfomobilityProvider infomobilityProvider,
+      IStrikeProvider strikeProvider)
   {
     _routeStatusService = routeStatusService;
     _infomobilityProvider = infomobilityProvider;
+    _strikeProvider = strikeProvider;
   }
 
   [HttpGet("status")]
@@ -59,5 +63,20 @@ public class RoutesController : ControllerBase
   {
     return stationId is not null &&
            Regex.IsMatch(stationId, "^S\\d{5}$");
+  }
+  [HttpGet("strike")]
+  public async Task<IActionResult> GetCurrentStrike()
+  {
+    var strike = await _strikeProvider.GetCurrentStrikeAsync();
+
+    if (strike is null)
+    {
+      return NotFound(new
+      {
+        message = "No current strike found."
+      });
+    }
+
+    return Ok(strike);
   }
 }
